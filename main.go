@@ -11,15 +11,23 @@ func main() {
 	fileBytes, err := os.ReadFile("dist/main.js")
 	if err != nil {
 		fmt.Print(err)
+		return
 	}
-
 	mainJSContents := string(fileBytes)
 
 	ctx := v8.NewContext()
-	ctx.RunScript(mainJSContents, "main.js")
-	val, err := ctx.RunScript("out", "test-get-value.js") // any functions previously added to the context can be called
+
+	// Run the bundled javascript file, which includes npm dependencies and defines a global variable "out"
+	_, err = ctx.RunScript(mainJSContents, "main.js")
 	if err != nil {
-		panic(err)
+		fmt.Print(err)
+		return
+	}
+	// Get the value of the global variable "out"
+	val, err := ctx.RunScript("out", "test-get-value.js")
+	if err != nil {
+		fmt.Print(err)
+		return
 	}
 	fmt.Println(val.String())
 }
