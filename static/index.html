@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Go V8 Demo</title>
+    <script>
+      async function postCode() {
+        const outputArea = document.querySelector("#output-area");
+        const errorArea = document.querySelector("#error-area");
+        const errorContainer = document.querySelector("#error-container");
+        const argument = document.querySelector("#argument-input").value;
+        const functionDefinition = document.querySelector(
+          "#function-def-input"
+        ).value;
+
+        try {
+          const res = await fetch("/run", {
+            method: "POST",
+            body: JSON.stringify({ functionDefinition, argument }),
+          });
+          if (!res.ok) {
+            throw new Error(await res.text());
+          }
+          const output = await res.text();
+          errorContainer.style.display = "none";
+          errorArea.innerHTML = "";
+          outputArea.innerHTML = output;
+        } catch (e) {
+          errorContainer.style.display = "block";
+          errorArea.innerHTML = e.message;
+          outputArea.innerHTML = "";
+        }
+      }
+    </script>
+  </head>
+  <body style="padding: 50px">
+    <h1>Go V8 Demo</h1>
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <h2>Argument</h2>
+      <input id="argument-input" value="{ a: 1, b: 2 }" />
+
+      <h2>Function Definition</h2>
+      <textarea id="function-def-input" rows="10">
+function execute(input) {
+    return input.a + input.b;
+}</textarea
+      >
+      <button onClick="postCode()">Execute</button>
+
+      <div>
+        <h2>Output</h2>
+        <pre id="output-area"></pre>
+      </div>
+
+      <div id="error-container" style="color: red; display: none">
+        <h2>Error</h2>
+        <pre id="error-area"></pre>
+      </div>
+    </div>
+  </body>
+</html>
