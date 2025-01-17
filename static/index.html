@@ -3,6 +3,8 @@
   <head>
     <title>Go V8 Demo</title>
     <script>
+      setTimeout(postCode, 200);
+
       async function postCode() {
         const outputArea = document.querySelector("#output-area");
         const errorArea = document.querySelector("#error-area");
@@ -21,6 +23,15 @@
             throw new Error(await res.text());
           }
           const output = await res.text();
+
+          if (
+            argument !== document.querySelector("#argument-input").value ||
+            functionDefinition !==
+              document.querySelector("#function-def-input").value
+          ) {
+            // The inputs have changed since this request was sent; ignore the result.
+            return;
+          }
           errorContainer.style.display = "none";
           errorArea.innerHTML = "";
           outputArea.innerHTML = output;
@@ -36,15 +47,14 @@
     <h1>Go V8 Demo</h1>
     <div style="display: flex; flex-direction: column; gap: 16px">
       <h2>Argument</h2>
-      <input id="argument-input" value="{ a: 1, b: 2 }" />
+      <input id="argument-input" value="{ a: 1, b: 2 }" oninput="postCode()" />
 
       <h2>Function Definition</h2>
-      <textarea id="function-def-input" rows="10">
+      <textarea id="function-def-input" rows="10" oninput="postCode()">
 function execute(input) {
     return input.a + input.b;
 }</textarea
       >
-      <button onClick="postCode()">Execute</button>
 
       <div>
         <h2>Output</h2>
